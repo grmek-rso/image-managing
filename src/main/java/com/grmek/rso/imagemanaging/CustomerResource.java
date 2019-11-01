@@ -24,6 +24,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * @author Benjamin Kastelic
@@ -33,6 +34,9 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("customers")
 public class CustomerResource {
+
+    @Inject
+    private ConfigurationProperties configurationProperties;
 
     @GET
     public Response getAllCustomers() {
@@ -47,6 +51,12 @@ public class CustomerResource {
         return customer != null
                 ? Response.ok(customer).build()
                 : Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    @GET
+    @Path("parameter")
+    public Response getParameter() {
+        return Response.ok(configurationProperties.getCustomersParameter()).build();
     }
 
     @POST
