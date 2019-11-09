@@ -4,12 +4,12 @@ kumuluzee:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://localhost:8080
+    base-url: http://image-managing:8080
     http:
       port: 8080
   config:
     etcd:
-      hosts: http://192.168.99.100:2379
+      hosts: http://etcd:2379
 
 configuration-properties:
   customers-parameter: file
