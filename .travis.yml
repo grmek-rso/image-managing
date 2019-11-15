@@ -27,5 +27,5 @@ script:
   - docker build -t "$DOCKER_IMAGE" .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push "$DOCKER_IMAGE"
-  - curl -s "https://raw.githubusercontent.com/grmek-rso/general/master/deployment/kubernetes/$SERVICE_NAME.yaml" | sed "s,image:.*,image: grmek/image-managing:1.0.0-SNAPSHOT-5.1," > "$HOME/deployment.yaml"
+  - curl -s "https://raw.githubusercontent.com/grmek-rso/general/master/deployment/kubernetes/$SERVICE_NAME.yaml" | sed "s,image:: .*,image:: $DOCKER_IMAGE," > "$HOME/deployment.yaml"
   - kubectl apply -f "$HOME/deployment.yaml"
