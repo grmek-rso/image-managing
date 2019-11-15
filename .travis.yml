@@ -19,12 +19,9 @@ install:
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf "$HOME/google-cloud-sdk"; curl https://sdk.cloud.google.com | bash > /dev/null; fi
   - source $HOME/google-cloud-sdk/path.bash.inc
   - gcloud components update kubectl
-  - gcloud version
-  - kubectl version
   - echo "$GCP_KEY" > "$HOME/gcp_key.json"
   - gcloud auth activate-service-account --key-file="$HOME/gcp_key.json"
   - gcloud container clusters get-credentials standard-cluster-1 --zone us-central1-a --project grmek-rso
-  - kubectl get nodes
 script:
   - mvn clean package -U
   - docker build -t "$DOCKER_IMAGE" .
