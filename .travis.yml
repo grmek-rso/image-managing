@@ -8,12 +8,27 @@ jdk:
 cache:
   directories:
     - "$HOME/.m2"
+    - "$HOME/google-cloud-sdk"
 env:
   global:
-    - DOCKER_IMAGE=grmek/image-managing:1.0.0-SNAPSHOT-$TRAVIS_JOB_NUMBER
+    - SERVICE_NAME=image-managing
+    - VERSION=1.0.0-SNAPSHOT
+    - DOCKER_IMAGE=grmek/$SERVICE_NAME:$VERSION-$TRAVIS_JOB_NUMBER
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+install:
+  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf "$HOME/google-cloud-sdk"; curl https://sdk.cloud.google.com | bash > /dev/null; fi
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud components update kubectl
+  - gcloud version
+  - kubectl version
+  - echo "$GCP_KEY" > "$HOME/gcp_key.json"
+  - gcloud auth activate-service-account --key-file="$HOME/gcp_key.json"
+  - gcloud container clusters get-credentials standard-cluster-1 --zone us-central1-a --project grmek-rso
+  - kubectl get nodes
 script:
   - mvn clean package -U
   - docker build -t "$DOCKER_IMAGE" .
-after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push "$DOCKER_IMAGE"
+  - curl -s "https://raw.githubusercontent.com/grmek-rso/general/master/deployment/kubernetes/$SERVICE_NAME.yaml" | sed "s,image:.*,image: $DOCKER_IMAGE," > "$HOME/deployment.yaml"
+  - kubectl apply -f "$HOME/deployment.yaml"
