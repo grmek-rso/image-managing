@@ -8,15 +8,14 @@ import com.kumuluz.ee.configuration.cdi.ConfigValue;
 @ConfigBundle("configuration-properties")
 public class ConfigurationProperties {
 
-    @ConfigValue(value = "customers-parameter", watch = true)
-    private String customersParameter;
+    @ConfigValue(value = "users-parameter", watch = true)
+    private String usersParameter;
 
-    public String getCustomersParameter() {
-        return customersParameter;
+    public String getUsersParameter() {
+        return usersParameter;
     }
 
-    public void setCustomersParameter(String customersParameter) {
-        this.customersParameter = customersParameter;
+    public void setUsersParameter(String usersParameter) {
+        this.usersParameter = usersParameter;
     }
-
 }

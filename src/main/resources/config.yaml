@@ -12,4 +12,4 @@ kumuluzee:
       hosts: http://etcd:2379
 
 configuration-properties:
-  customers-parameter: file
+  users-parameter: file
