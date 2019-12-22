@@ -14,6 +14,10 @@ kumuluzee:
     checks:
       etcd-health-check:
         connection-url: http://etcd:2379/health
+  metrics:
+    web-instrumentation:
+      - name: users-endpoint
+        url-pattern: /v1/users/*
 
 configuration-properties:
   demo-etcd-parameter: file
