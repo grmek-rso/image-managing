@@ -8,14 +8,25 @@ import com.kumuluz.ee.configuration.cdi.ConfigValue;
 @ConfigBundle("configuration-properties")
 public class ConfigurationProperties {
 
-    @ConfigValue(value = "users-parameter", watch = true)
-    private String usersParameter;
+    @ConfigValue(value = "demo-etcd-parameter", watch = true)
+    private String demoEtcdParameter;
 
-    public String getUsersParameter() {
-        return usersParameter;
+    public String getDemoEtcdParameter() {
+        return demoEtcdParameter;
     }
 
-    public void setUsersParameter(String usersParameter) {
-        this.usersParameter = usersParameter;
+    public void setDemoEtcdParameter(String demoEtcdParameter) {
+        this.demoEtcdParameter = demoEtcdParameter;
+    }
+
+    @ConfigValue(value = "demo-service-is-healthy", watch = true)
+    private String demoServiceIsHealthy;
+
+    public String getDemoServiceIsHealthy() {
+        return demoServiceIsHealthy;
+    }
+
+    public void setDemoServiceIsHealthy(String demoServiceIsHealthy) {
+        this.demoServiceIsHealthy = demoServiceIsHealthy;
     }
 }

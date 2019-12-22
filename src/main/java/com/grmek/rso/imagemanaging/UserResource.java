@@ -1,6 +1,5 @@
 package com.grmek.rso.imagemanaging;
 
-import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -11,9 +10,6 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("users")
 public class UserResource {
-
-    @Inject
-    private ConfigurationProperties configurationProperties;
 
     @POST
     public Response addNewUser(User user) {
@@ -44,12 +40,6 @@ public class UserResource {
         users.add(user);
 
         return Response.ok(users).build();
-    }
-
-    @GET
-    @Path("parameter")
-    public Response getParameter() {
-        return Response.ok(configurationProperties.getUsersParameter()).build();
     }
 
     @GET

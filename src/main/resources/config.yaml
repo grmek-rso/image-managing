@@ -4,12 +4,17 @@ kumuluzee:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://image-managing:8080
+    base-url: http://localhost:8080
     http:
       port: 8080
   config:
     etcd:
       hosts: http://etcd:2379
+  health:
+    checks:
+      etcd-health-check:
+        connection-url: http://etcd:2379/health
 
 configuration-properties:
-  users-parameter: file
+  demo-etcd-parameter: file
+  demo-service-is-healthy: true
