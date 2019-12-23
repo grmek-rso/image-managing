@@ -1,5 +1,6 @@
 package com.grmek.rso.imagemanaging;
 
+import com.kumuluz.ee.logs.cdi.Log;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -9,6 +10,7 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("users/{userId}/albums/{albumId}/images")
+@Log
 public class ImageResource {
 
     @POST

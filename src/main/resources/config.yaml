@@ -18,6 +18,25 @@ kumuluzee:
     web-instrumentation:
       - name: users-endpoint
         url-pattern: /v1/users/*
+  logs:
+    config-file: '<?xml version="1.0" encoding="UTF-8"?>
+                  <Configuration name="image-managing">
+                    <Appenders>
+                      <Console name="console" target="SYSTEM_OUT">
+                        <PatternLayout pattern="%d %p %marker %m %X %ex %n"/>
+                      </Console>
+                      <Socket name="logstash" host="984fd9b0-06a6-4350-acbb-9a328652e786-ls.logit.io" port="16623"
+                       protocol="tcp">
+                        <JSONLayout complete="false" compact="true" eventEol="true" charset="UTF-8" properties="true"/>
+                      </Socket>
+                    </Appenders>
+                    <Loggers>
+                      <Root level="all">
+                        <AppenderRef ref="console" level="info"/>
+                        <AppenderRef ref="logstash" level="trace"/>
+                      </Root>
+                    </Loggers>
+                  </Configuration>'
 
 configuration-properties:
   demo-etcd-parameter: file
