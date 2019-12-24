@@ -41,3 +41,6 @@ kumuluzee:
 configuration-properties:
   demo-etcd-parameter: file
   demo-service-is-healthy: true
+  db-url: jdbc:mysql://10.67.0.3:3306/grmek-rso
+  db-user: root
+  db-password: lPKKoBPxlnzhkkrn

@@ -1,11 +1,17 @@
 package com.grmek.rso.imagemanaging;
 
 import com.kumuluz.ee.logs.cdi.Log;
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.LinkedList;
 import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -13,33 +19,43 @@ import java.util.List;
 @Log
 public class UserResource {
 
+    @Inject
+    private ConfigurationProperties cfg;
+
     @POST
     public Response addNewUser(User user) {
-        /* TODO: ... */
+        try (
+            Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
+            Statement stmt = con.createStatement();
+        ) {
+            stmt.executeUpdate("INSERT INTO `users` (`name`) VALUES ('" + user.getName() + "')");
+        }
+        catch (SQLException e) {
+            System.err.println(e);
+        }
+
         return Response.noContent().build();
     }
     
     @GET
     public Response getAllUsers() {
-        /* TODO: ... */
         List<User> users = new LinkedList<User>();
 
-        User user;
-
-        user = new User();
-        user.setId("1");
-        user.setName("My First User");
-        users.add(user);
-
-        user = new User();
-        user.setId("2");
-        user.setName("Username");
-        users.add(user);
-
-        user = new User();
-        user.setId("3");
-        user.setName("Test User");
-        users.add(user);
+        try (
+            Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM `users`");
+        ) {
+            while (rs.next()) {
+                User user = new User();
+                user.setId(Integer.toString(rs.getInt(1)));
+                user.setName(rs.getString(2));
+                users.add(user);
+            }
+        }
+        catch (SQLException e) {
+            System.err.println(e);
+        }
 
         return Response.ok(users).build();
     }
@@ -47,8 +63,22 @@ public class UserResource {
     @GET
     @Path("{userId}")
     public Response getUser(@PathParam("userId") String userId) {
-        /* TODO: ... */
-        User user = new User();
+        User user = null;
+
+        try (
+            Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM `users` WHERE `users`.`id` = " + userId);
+        ) {
+            if (rs.next()) {
+                user = new User();
+                user.setId(Integer.toString(rs.getInt(1)));
+                user.setName(rs.getString(2));
+            }
+        }
+        catch (SQLException e) {
+            System.err.println(e);
+        }
 
         if (user != null)
         {
@@ -63,7 +93,16 @@ public class UserResource {
     @DELETE
     @Path("{userId}")
     public Response deleteUser(@PathParam("userId") String userId) {
-        /* TODO: ... */
+        try (
+            Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
+            Statement stmt = con.createStatement();
+        ) {
+            stmt.executeUpdate("DELETE FROM `users` WHERE `users`.`id` = " + userId);
+        }
+        catch (SQLException e) {
+            System.err.println(e);
+        }
+
         return Response.noContent().build();
     }
 }
