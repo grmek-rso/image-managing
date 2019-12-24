@@ -28,7 +28,7 @@ public class UserResource {
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
         ) {
-            stmt.executeUpdate("INSERT INTO `users` (`name`) VALUES ('" + user.getName() + "')");
+            stmt.executeUpdate("INSERT INTO users (name) VALUES ('" + user.getName() + "')");
         }
         catch (SQLException e) {
             System.err.println(e);
@@ -44,11 +44,11 @@ public class UserResource {
         try (
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM `users`");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users");
         ) {
             while (rs.next()) {
                 User user = new User();
-                user.setId(Integer.toString(rs.getInt(1)));
+                user.setId(rs.getString(1));
                 user.setName(rs.getString(2));
                 users.add(user);
             }
@@ -62,17 +62,17 @@ public class UserResource {
 
     @GET
     @Path("{userId}")
-    public Response getUser(@PathParam("userId") String userId) {
+    public Response getUser(@PathParam("userId") int userId) {
         User user = null;
 
         try (
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM `users` WHERE `users`.`id` = " + userId);
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = " + userId);
         ) {
             if (rs.next()) {
                 user = new User();
-                user.setId(Integer.toString(rs.getInt(1)));
+                user.setId(rs.getString(1));
                 user.setName(rs.getString(2));
             }
         }
@@ -92,12 +92,12 @@ public class UserResource {
 
     @DELETE
     @Path("{userId}")
-    public Response deleteUser(@PathParam("userId") String userId) {
+    public Response deleteUser(@PathParam("userId") int userId) {
         try (
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
         ) {
-            stmt.executeUpdate("DELETE FROM `users` WHERE `users`.`id` = " + userId);
+            stmt.executeUpdate("DELETE FROM users WHERE id = " + userId);
         }
         catch (SQLException e) {
             System.err.println(e);
