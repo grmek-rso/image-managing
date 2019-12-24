@@ -11,10 +11,10 @@ import javax.inject.Inject;
 public class DemoHealthCheck implements HealthCheck {
 
     @Inject
-    private ConfigurationProperties configurationProperties;
+    private ConfigurationProperties cfg;
 
     public HealthCheckResponse call() {
-        if (configurationProperties.getDemoServiceIsHealthy().equals("true")) {
+        if (cfg.getDemoServiceIsHealthy().equals("true")) {
             return HealthCheckResponse.up(DemoHealthCheck.class.getSimpleName());
         }
         else {

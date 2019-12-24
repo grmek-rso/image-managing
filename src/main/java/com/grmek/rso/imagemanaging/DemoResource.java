@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 public class DemoResource {
 
     @Inject
-    private ConfigurationProperties configurationProperties;
+    private ConfigurationProperties cfg;
 
     @GET
     @Path("info")
@@ -24,6 +24,6 @@ public class DemoResource {
     @GET
     @Path("etcd-parameter")
     public Response getParameter() {
-        return Response.ok(configurationProperties.getDemoEtcdParameter()).build();
+        return Response.ok(cfg.getDemoEtcdParameter()).build();
     }
 }
