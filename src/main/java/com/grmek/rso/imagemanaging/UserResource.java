@@ -32,6 +32,7 @@ public class UserResource {
         }
         catch (SQLException e) {
             System.err.println(e);
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         return Response.noContent().build();
@@ -55,6 +56,7 @@ public class UserResource {
         }
         catch (SQLException e) {
             System.err.println(e);
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         return Response.ok(users).build();
@@ -78,14 +80,13 @@ public class UserResource {
         }
         catch (SQLException e) {
             System.err.println(e);
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        if (user != null)
-        {
+        if (user != null) {
             return Response.ok(user).build();
         }
-        else
-        {
+        else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
@@ -96,11 +97,21 @@ public class UserResource {
         try (
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = " + userId);
         ) {
-            stmt.executeUpdate("DELETE FROM users WHERE id = " + userId);
+            if (rs.next()) {
+                stmt.executeUpdate("DELETE FROM users WHERE id = " + userId);
+
+                /* TODO: Delete all comments of the user. */
+
+                /* TODO: Delete all album sharing data of the user. */
+
+                /* TODO: Delete all image processing data of the user. */
+            }
         }
         catch (SQLException e) {
             System.err.println(e);
+            return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         return Response.noContent().build();
