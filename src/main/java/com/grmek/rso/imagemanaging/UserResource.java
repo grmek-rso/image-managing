@@ -105,8 +105,6 @@ public class UserResource {
                 /* TODO: Delete all comments of the user. */
 
                 /* TODO: Delete all album sharing data of the user. */
-
-                /* TODO: Delete all image processing data of the user. */
             }
         }
         catch (SQLException e) {

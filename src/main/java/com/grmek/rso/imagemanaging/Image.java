@@ -5,6 +5,7 @@ public class Image {
     private String id;
     private String name;
     private String url;
+    private String labels;
 
     public String getId() {
         return id;
@@ -28,5 +29,13 @@ public class Image {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getLabels() {
+        return labels;
+    }
+
+    public void setLabels(String labels) {
+        this.labels = labels;
     }
 }

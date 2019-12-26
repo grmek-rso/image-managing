@@ -129,8 +129,6 @@ public class AlbumResource {
                 /* TODO: Delete all comments of the album. */
 
                 /* TODO: Delete all album sharing data of the album. */
-
-                /* TODO: Delete all image processing data of the album. */
             }
         }
         catch (SQLException e) {

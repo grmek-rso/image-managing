@@ -44,10 +44,10 @@ public class ImageResource {
         try (
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * FROM albums WHERE id = "
-                                             + albumId + " AND user_id = " + userId);
+            ResultSet rs1 = stmt.executeQuery("SELECT * FROM albums WHERE id = "
+                                              + albumId + " AND user_id = " + userId);
         ) {
-            if (rs.next()) {
+            if (rs1.next()) {
                 /* Upload the image to the GCP Storage and get the url. */
                 String url = gcpUpload(request.getPart("image-file"));
 
@@ -56,10 +56,19 @@ public class ImageResource {
                         .useDelimiter("\\A")
                         .next();
 
-                stmt.executeUpdate("INSERT INTO images (name, url, album_id) VALUES ('"
-                                   + imageName + "', '" + url + "', '"+ albumId + "')");
+                stmt.executeUpdate("INSERT INTO images (name, url, labels, album_id) VALUES ('"
+                                   + imageName + "', '" + url + "', '', '"+ albumId + "')",
+                                   Statement.RETURN_GENERATED_KEYS);
 
-                /* TODO: Use the image processing MS. */
+                /* Get image id and request image processing. */
+                try (
+                    ResultSet rs2 = stmt.getGeneratedKeys();
+                ) {
+                    if (rs2.next()) {
+                        int imageId = rs2.getInt(1);
+                        /* TODO: Pass (imageId, url) to kafka ... get back (imageId, labels). */
+                    }
+                }
             }
             else {
                 return Response.status(Response.Status.FORBIDDEN).build();
@@ -96,6 +105,7 @@ public class ImageResource {
                         image.setId(rs2.getString(1));
                         image.setName(rs2.getString(2));
                         image.setUrl(rs2.getString(3));
+                        image.setLabels(rs2.getString(4));
                         images.add(image);
                     }
                 }
@@ -141,6 +151,7 @@ public class ImageResource {
                         image.setId(rs2.getString(1));
                         image.setName(rs2.getString(2));
                         image.setUrl(rs2.getString(3));
+                        image.setLabels(rs2.getString(4));
                     }
                 }
                 catch (SQLException e) {
@@ -189,8 +200,6 @@ public class ImageResource {
                         gcpDelete(url);
 
                         /* TODO: Delete all comments of the image. */
-
-                        /* TODO: Delete all image processing data of the image. */
                     }
                 }
                 catch (Exception e) {
@@ -243,7 +252,7 @@ public class ImageResource {
         /* Upload and return the url. */
         storage.create(BlobInfo.newBuilder(cfg.getGcpStorageBucket(), storageFileName).build(), storageFileData);
 
-        return "https://storage.cloud.google.com/" + cfg.getGcpStorageBucket() + "/" + storageFileName;
+        return "https://storage.googleapis.com/" + cfg.getGcpStorageBucket() + "/" + storageFileName;
     }
 
     private void gcpDelete(String url) throws IOException {
