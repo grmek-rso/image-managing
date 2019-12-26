@@ -1,10 +1,22 @@
 package com.grmek.rso.imagemanaging;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.kumuluz.ee.logs.cdi.Log;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.sql.Connection;
@@ -12,6 +24,8 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
+import java.util.UUID;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -23,9 +37,10 @@ public class ImageResource {
     private ConfigurationProperties cfg;
 
     @POST
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response addNewImage(@PathParam("userId") int userId,
                                 @PathParam("albumId") int albumId,
-                                Image image) {
+                                @Context HttpServletRequest request) {
         try (
             Connection con = DriverManager.getConnection(cfg.getDbUrl(), cfg.getDbUser(), cfg.getDbPassword());
             Statement stmt = con.createStatement();
@@ -33,12 +48,16 @@ public class ImageResource {
                                              + albumId + " AND user_id = " + userId);
         ) {
             if (rs.next()) {
-                /* TODO: Upload the image and get the url. */
+                /* Upload the image to the GCP Storage and get the url. */
+                String url = gcpUpload(request.getPart("image-file"));
 
-                String url = "http://myurl.com/img.png";
+                /* Add image entry to the DB. */
+                String imageName = new Scanner(request.getPart("image-name").getInputStream())
+                        .useDelimiter("\\A")
+                        .next();
 
                 stmt.executeUpdate("INSERT INTO images (name, url, album_id) VALUES ('"
-                                   + image.getName() + "', '" + url + "', '"+ albumId + "')");
+                                   + imageName + "', '" + url + "', '"+ albumId + "')");
 
                 /* TODO: Use the image processing MS. */
             }
@@ -46,7 +65,7 @@ public class ImageResource {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         }
-        catch (SQLException e) {
+        catch (Exception e) {
             System.err.println(e);
             return Response.status(Response.Status.FORBIDDEN).build();
         }
@@ -160,17 +179,21 @@ public class ImageResource {
                                                       + imageId + " AND album_id = " + albumId);
                 ) {
                     if (rs2.next()) {
+                        String url = rs2.getString(3);
+
+                        /* Remove entry from the DB. */
                         stmt.executeUpdate("DELETE FROM images WHERE id = "
                                            + imageId + " AND album_id = " + albumId);
 
-                        /* TODO: Delete the image at the url. */
+                        /* Delete the image from the GCP Storage by the url. */
+                        gcpDelete(url);
 
                         /* TODO: Delete all comments of the image. */
 
                         /* TODO: Delete all image processing data of the image. */
                     }
                 }
-                catch (SQLException e) {
+                catch (Exception e) {
                     System.err.println(e);
                     return Response.status(Response.Status.FORBIDDEN).build();
                 }
@@ -182,5 +205,64 @@ public class ImageResource {
         }
 
         return Response.noContent().build();
+    }
+
+    private String gcpUpload(Part filePart) throws Exception {
+        /* Check file by the name. */
+        String fileName = filePart.getSubmittedFileName();
+
+        if (fileName == null || fileName.isEmpty() || !fileName.contains(".")) {
+            throw new Exception("Invalid file name.");
+        }
+
+        String fileNameExtension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        if (!(fileNameExtension.equals("jpg") || fileNameExtension.equals("png"))) {
+            throw new Exception("File should be either jpg or png.");
+        }
+
+        /* Get the storage object. */
+        Storage storage = StorageOptions
+                .newBuilder()
+                .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(cfg.getGcpKey().getBytes())))
+                .setProjectId(cfg.getGcpProject())
+                .build()
+                .getService();
+
+        /* Generate new file name for storage and prepare the file for uploading. */
+        String storageFileName = UUID.randomUUID().toString() + "." + fileNameExtension;
+
+        InputStream fileStream = filePart.getInputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] readBuf = new byte[4096];
+        while (fileStream.available() > 0) {
+            int bytesRead = fileStream.read(readBuf);
+            outputStream.write(readBuf, 0, bytesRead);
+        }
+        byte[] storageFileData = outputStream.toByteArray();
+
+        /* Upload and return the url. */
+        storage.create(BlobInfo.newBuilder(cfg.getGcpStorageBucket(), storageFileName).build(), storageFileData);
+
+        return "https://storage.cloud.google.com/" + cfg.getGcpStorageBucket() + "/" + storageFileName;
+    }
+
+    private void gcpDelete(String url) throws IOException {
+        /* Check the url. */
+        if (url == null || url.isEmpty() || !url.contains("/")) {
+            return;
+        }
+
+        /* Get the storage object. */
+        Storage storage = StorageOptions
+                .newBuilder()
+                .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(cfg.getGcpKey().getBytes())))
+                .setProjectId(cfg.getGcpProject())
+                .build()
+                .getService();
+
+        /* Get the blob id and delete the blob. */
+        String blobName = url.substring(url.lastIndexOf('/') + 1);
+        BlobId blobId = BlobId.of(cfg.getGcpStorageBucket(), blobName);
+        storage.delete(blobId);
     }
 }

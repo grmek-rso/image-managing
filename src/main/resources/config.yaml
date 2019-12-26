@@ -44,3 +44,6 @@ configuration-properties:
   db-url: jdbc:mysql://10.67.0.3:3306/image-managing
   db-user: root
   db-password: lPKKoBPxlnzhkkrn
+  gcp-project: grmek-rso
+  gcp-key: <hidden>
+  gcp-storage-bucket: grmek-rso-storage-bucket

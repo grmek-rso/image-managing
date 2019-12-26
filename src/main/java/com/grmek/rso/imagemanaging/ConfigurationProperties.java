@@ -62,4 +62,37 @@ public class ConfigurationProperties {
     public void setDbPassword(String dbPassword) {
         this.dbPassword = dbPassword;
     }
+
+    @ConfigValue(value = "gcp-project", watch = true)
+    private String gcpProject;
+
+    public String getGcpProject() {
+        return gcpProject;
+    }
+
+    public void setGcpProject(String gcpProject) {
+        this.gcpProject = gcpProject;
+    }
+
+    @ConfigValue(value = "gcp-key", watch = true)
+    private String gcpKey;
+
+    public String getGcpKey() {
+        return gcpKey;
+    }
+
+    public void setGcpKey(String gcpKey) {
+        this.gcpKey = gcpKey;
+    }
+
+    @ConfigValue(value = "gcp-storage-bucket", watch = true)
+    private String gcpStorageBucket;
+
+    public String getGcpStorageBucket() {
+        return gcpStorageBucket;
+    }
+
+    public void setGcpStorageBucket(String gcpStorageBucket) {
+        this.gcpStorageBucket = gcpStorageBucket;
+    }
 }
