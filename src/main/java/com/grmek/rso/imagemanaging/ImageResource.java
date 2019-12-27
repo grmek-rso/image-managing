@@ -38,6 +38,9 @@ public class ImageResource {
     private ConfigurationProperties cfg;
 
     @Inject
+    private ImageProcessingService imageProcessingService;
+
+    @Inject
     @RestClient
     private CommentingService commentingService;
 
@@ -71,7 +74,7 @@ public class ImageResource {
                 ) {
                     if (rs2.next()) {
                         int imageId = rs2.getInt(1);
-                        /* TODO: Pass (imageId, url) to kafka ... get back (imageId, labels). */
+                        imageProcessingService.requestProcessing(imageId, url);
                     }
                 }
             }
