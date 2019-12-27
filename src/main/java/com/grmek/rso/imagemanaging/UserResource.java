@@ -1,6 +1,7 @@
 package com.grmek.rso.imagemanaging;
 
 import com.kumuluz.ee.logs.cdi.Log;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -21,6 +22,10 @@ public class UserResource {
 
     @Inject
     private ConfigurationProperties cfg;
+
+    @Inject
+    @RestClient
+    private CommentingService commentingService;
 
     @POST
     public Response addNewUser(User user) {
@@ -100,9 +105,11 @@ public class UserResource {
             ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE id = " + userId);
         ) {
             if (rs.next()) {
+                /* Remove entry from the DB. */
                 stmt.executeUpdate("DELETE FROM users WHERE id = " + userId);
 
-                /* TODO: Delete all comments of the user. */
+                /* Delete all comments for the user. */
+                commentingService.deleteCommentsForUser(userId);
 
                 /* TODO: Delete all album sharing data of the user. */
             }

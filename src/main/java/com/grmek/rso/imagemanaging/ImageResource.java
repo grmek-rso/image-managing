@@ -6,6 +6,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.kumuluz.ee.logs.cdi.Log;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
@@ -35,6 +36,10 @@ public class ImageResource {
 
     @Inject
     private ConfigurationProperties cfg;
+
+    @Inject
+    @RestClient
+    private CommentingService commentingService;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -199,7 +204,8 @@ public class ImageResource {
                         /* Delete the image from the GCP Storage by the url. */
                         gcpDelete(url);
 
-                        /* TODO: Delete all comments of the image. */
+                        /* Delete all comments for the image. */
+                        commentingService.deleteCommentsForImage(imageId);
                     }
                 }
                 catch (Exception e) {

@@ -37,6 +37,12 @@ kumuluzee:
                       </Root>
                     </Loggers>
                   </Configuration>'
+  rest-client:
+    registrations:
+      - class: commenting
+        url: http://commenting:8081/v1
+        connect-timeout: 1000
+        read-timeout: 5000
 
 configuration-properties:
   demo-etcd-parameter: file

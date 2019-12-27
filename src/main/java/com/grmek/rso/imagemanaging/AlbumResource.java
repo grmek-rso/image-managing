@@ -1,6 +1,7 @@
 package com.grmek.rso.imagemanaging;
 
 import com.kumuluz.ee.logs.cdi.Log;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -21,6 +22,10 @@ public class AlbumResource {
 
     @Inject
     private ConfigurationProperties cfg;
+
+    @Inject
+    @RestClient
+    private CommentingService commentingService;
 
     @POST
     public Response addNewAlbum(@PathParam("userId") int userId,
@@ -124,9 +129,11 @@ public class AlbumResource {
                                              + albumId + " AND user_id = " + userId);
         ) {
             if (rs.next()) {
+                /* Remove entry from the DB. */
                 stmt.executeUpdate("DELETE FROM albums WHERE id = " + albumId + " AND user_id = " + userId);
 
-                /* TODO: Delete all comments of the album. */
+                /* Delete all comments for the album. */
+                commentingService.deleteCommentsForAlbum(albumId);
 
                 /* TODO: Delete all album sharing data of the album. */
             }
