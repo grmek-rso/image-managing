@@ -40,7 +40,7 @@ kumuluzee:
   rest-client:
     registrations:
       - class: commenting
-        url: http://commenting:8081/v1
+        url: http://commenting:8081
         connect-timeout: 1000
         read-timeout: 5000
   streaming:

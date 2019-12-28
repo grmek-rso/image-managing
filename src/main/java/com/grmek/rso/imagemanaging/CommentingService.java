@@ -4,23 +4,23 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import javax.enterprise.context.Dependent;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("")
+@Path("v1/comments")
 @RegisterRestClient(configKey="commenting")
 @Dependent
 public interface CommentingService {
 
     @DELETE
-    @Path("/users/{userId}")
-    Response deleteCommentsForUser(@PathParam("userId") int userId);
+    @Path("user-clean-up")
+    Response deleteCommentsForUser(@QueryParam("user") int userId);
 
     @DELETE
-    @Path("/albums/{albumId}")
-    Response deleteCommentsForAlbum(@PathParam("albumId") int albumId);
+    @Path("album-clean-up")
+    Response deleteCommentsForAlbum(@QueryParam("album") int albumId);
 
     @DELETE
-    @Path("/images/{imageId}")
-    Response deleteCommentsForImage(@PathParam("imageId") int imageId);
+    @Path("image-clean-up")
+    Response deleteCommentsForImage(@QueryParam("image") int imageId);
 }
