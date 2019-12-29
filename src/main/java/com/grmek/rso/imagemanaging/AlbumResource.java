@@ -25,7 +25,10 @@ public class AlbumResource {
 
     @Inject
     @RestClient
-    private CommentingService commentingService;
+    private CommentingRestService commentingService;
+
+    @Inject
+    private SharingGrpcService sharingService;
 
     @POST
     public Response addNewAlbum(@PathParam("userId") int userId,
@@ -133,9 +136,10 @@ public class AlbumResource {
                 stmt.executeUpdate("DELETE FROM albums WHERE id = " + albumId + " AND user_id = " + userId);
 
                 /* Delete all comments for the album. */
-                commentingService.deleteCommentsForAlbum(albumId);
+                commentingService.albumCleanUp(albumId);
 
-                /* TODO: Delete all album sharing data of the album. */
+                /* Delete all album sharing data for the album. */
+                sharingService.albumCleanUp(albumId);
             }
         }
         catch (SQLException e) {

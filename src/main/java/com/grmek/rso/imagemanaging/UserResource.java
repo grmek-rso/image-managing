@@ -25,7 +25,10 @@ public class UserResource {
 
     @Inject
     @RestClient
-    private CommentingService commentingService;
+    private CommentingRestService commentingService;
+
+    @Inject
+    private SharingGrpcService sharingService;
 
     @POST
     public Response addNewUser(User user) {
@@ -109,9 +112,10 @@ public class UserResource {
                 stmt.executeUpdate("DELETE FROM users WHERE id = " + userId);
 
                 /* Delete all comments for the user. */
-                commentingService.deleteCommentsForUser(userId);
+                commentingService.userCleanUp(userId);
 
-                /* TODO: Delete all album sharing data of the user. */
+                /* Delete all album sharing data for the user. */
+                sharingService.userCleanUp(userId);
             }
         }
         catch (SQLException e) {

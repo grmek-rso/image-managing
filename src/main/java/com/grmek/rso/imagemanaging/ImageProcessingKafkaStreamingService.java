@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 @ApplicationScoped
-public class ImageProcessingService {
+public class ImageProcessingKafkaStreamingService {
 
     @Inject
     private ConfigurationProperties cfg;

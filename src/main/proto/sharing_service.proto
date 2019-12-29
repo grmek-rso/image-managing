@@ -1,0 +1,15 @@
+syntax = "proto3";
+option java_package = "com.grmek.rso.imagemanaging";
+
+service Sharing {
+    rpc userCleanUp(CleanUpRequest) returns (CleanUpResponse) {};
+    rpc albumCleanUp(CleanUpRequest) returns (CleanUpResponse) {};
+}
+
+message CleanUpRequest {
+    int32 id = 1;
+}
+
+message CleanUpResponse {
+    int32 status = 1;
+}

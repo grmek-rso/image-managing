@@ -38,11 +38,11 @@ public class ImageResource {
     private ConfigurationProperties cfg;
 
     @Inject
-    private ImageProcessingService imageProcessingService;
+    private ImageProcessingKafkaStreamingService imageProcessingService;
 
     @Inject
     @RestClient
-    private CommentingService commentingService;
+    private CommentingRestService commentingService;
 
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -208,7 +208,7 @@ public class ImageResource {
                         gcpDelete(url);
 
                         /* Delete all comments for the image. */
-                        commentingService.deleteCommentsForImage(imageId);
+                        commentingService.imageCleanUp(imageId);
                     }
                 }
                 catch (Exception e) {

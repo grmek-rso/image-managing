@@ -10,17 +10,17 @@ import javax.ws.rs.core.Response;
 @Path("v1/comments")
 @RegisterRestClient(configKey="commenting")
 @Dependent
-public interface CommentingService {
+public interface CommentingRestService {
 
     @DELETE
     @Path("user-clean-up")
-    Response deleteCommentsForUser(@QueryParam("user") int userId);
+    Response userCleanUp(@QueryParam("user") int userId);
 
     @DELETE
     @Path("album-clean-up")
-    Response deleteCommentsForAlbum(@QueryParam("album") int albumId);
+    Response albumCleanUp(@QueryParam("album") int albumId);
 
     @DELETE
     @Path("image-clean-up")
-    Response deleteCommentsForImage(@QueryParam("image") int imageId);
+    Response imageCleanUp(@QueryParam("image") int imageId);
 }
