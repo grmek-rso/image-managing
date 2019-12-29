@@ -59,7 +59,7 @@ kumuluzee:
         sasl-jaas-config: 'org.apache.kafka.common.security.scram.ScramLoginModule required username="ptjc95jg" password="<hidden>";'
       consumer:
         bootstrap-servers: omnibus-01.srvs.cloudkafka.com:9094
-        group-id: group1
+        group-id: ptjc95jg-consumer
         enable-auto-commit: true
         auto-commit-interval-ms: 1000
         auto-offset-reset: earliest
