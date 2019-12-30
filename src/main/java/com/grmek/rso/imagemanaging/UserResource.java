@@ -28,6 +28,9 @@ public class UserResource {
     private CommentingRestService commentingService;
 
     @Inject
+    private DemoFaultTolerance demoFaultTolerance;
+
+    @Inject
     private SharingGrpcService sharingService;
 
     @POST
@@ -112,7 +115,7 @@ public class UserResource {
                 stmt.executeUpdate("DELETE FROM users WHERE id = " + userId);
 
                 /* Delete all comments for the user. */
-                commentingService.userCleanUp(userId);
+                demoFaultTolerance.commentingServiceUserCleanUp(userId);
 
                 /* Delete all album sharing data for the user. */
                 sharingService.userCleanUp(userId);
